@@ -57,7 +57,7 @@ tests:
         - pytest
     files:
       source:
-        - tests/
+        - highspy/tests/
 
 about:
   summary: High performance serial and parallel solver for large scale sparse linear optimization problems
