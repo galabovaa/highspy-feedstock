@@ -1,10 +1,6 @@
 context:
   name: highspy
-  version: "1.14.0.dev3"
-
-package:
-  name: ${{ name|lower }}
-  version: ${{ version }}
+  version: "1.14.0.dev2"
 
 source:
   # url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/highspy-{{ version }}.tar.gz
@@ -12,52 +8,104 @@ source:
   # sha256: 05931e8dd8c8cac514da8297003c31a206a0004d542b7da500810b85c87c20b9
 
   git: https://github.com/ERGO-Code/HiGHS
-  rev: 356c48c5772b46c484f6f328bde577fb3ec93519 # PR #3038
+  rev: 6258233eac76df5bf3b8d657eea0f7805320375f # test-mkl-conda branch
 
-build:
-  number: 0
-  script: ${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
-
-requirements:
-  build:
-    - if: build_platform != target_platform
-      then:
-        - python
-        - cross-python_${{ target_platform }}
-        - numpy
-    - ${{ compiler('c') }}
-    - ${{ stdlib('c') }}
-    - ${{ compiler('cxx') }}
-    - cmake
-    - if: unix
-      then: make
-  host:
-    - python
-    - pip
-    - scikit-build-core
-    - numpy
-    - pybind11
-  run:
-    - python
-    - numpy
-  ignore_run_exports:
-    from_package:
-      - numpy
-
-tests:
-  - python:
-      imports:
-        - highspy
-      pip_check: true
-  - script:
-      - python -m pytest highspy/tests/test_highspy.py
+outputs:
+  - package:
+      name: ${{ name|lower }}
+      version: ${{ version }}
+    build:
+      number: 0
+      script: ${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
     requirements:
+      build:
+        - if: build_platform != target_platform
+          then:
+            - python
+            - cross-python_${{ target_platform }}
+            - numpy
+        - ${{ compiler('c') }}
+        - ${{ stdlib('c') }}
+        - ${{ compiler('cxx') }}
+        - cmake
+        - if: unix
+          then: make
+      host:
+        - python
+        - pip
+        - scikit-build-core
+        - numpy
+        - pybind11
       run:
         - python
-        - pytest
-    files:
-      source:
-        - highspy/tests/
+        - numpy
+      ignore_run_exports:
+        from_package:
+          - numpy
+    tests:
+      - python:
+          imports:
+            - highspy
+          pip_check: true
+      - script:
+          - python -m pytest highspy/tests/test_highspy.py
+        requirements:
+          run:
+            - python
+            - pytest
+        files:
+          source:
+            - highspy/tests/
+
+  - package:
+      name: highspy-hipo
+      version: ${{ version }}
+    build:
+      number: 0
+      script: ${{ PYTHON }} -m pip install ./highspy-extras -vv --no-deps --no-build-isolation
+    requirements:
+      host:
+        - python
+        - pip
+        - ${{ pin_subpackage('highspy', exact=True) }}
+      run:
+        - ${{ pin_subpackage('highspy', exact=True) }}
+        - openblas
+    tests:
+      - script:
+          - python -m pytest check/test_highspy_hipo.py
+        requirements:
+          run:
+            - python
+            - pytest
+        files:
+          source:
+            - check/
+
+  - package:
+      name: highspy-hipo-mkl
+      version: ${{ version }}
+    build:
+      number: 0
+      script: ${{ PYTHON }} -m pip install ./highspy-extras -vv --no-deps --no-build-isolation
+    requirements:
+      host:
+        - python
+        - pip
+        - ${{ pin_subpackage('highspy', exact=True) }}
+      run:
+        - ${{ pin_subpackage('highspy', exact=True) }}
+        - mkl
+    tests:
+      - script:
+          - python -m pytest check/test_highspy_hipo.py
+        requirements:
+          run:
+            - python
+            - pytest
+        files:
+          source:
+            - check/
 
 about:
   summary: High performance serial and parallel solver for large scale sparse linear optimization problems
