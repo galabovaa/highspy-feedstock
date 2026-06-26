@@ -62,11 +62,29 @@ outputs:
       version: ${{ version }}
     build:
       number: 0
-      script: ${{ PYTHON }} -m pip install ./highspy-extras -vv --no-deps --no-build-isolation
+      script: >-
+        ${{ PYTHON }} -m pip install ./highspy-extras -vv --no-deps --no-build-isolation
+        --config-settings=cmake.define.BUILD_OPENBLAS=OFF
+
     requirements:
+      build:
+        - if: build_platform != target_platform
+          then:
+            - python
+            - cross-python_${{ target_platform }}
+            - numpy
+        - ${{ compiler('c') }}
+        - ${{ stdlib('c') }}
+        - ${{ compiler('cxx') }}
+        - cmake
+        - if: unix
+          then: make
       host:
         - python
         - pip
+        - scikit-build-core
+        - numpy
+        - pybind11
         - ${{ pin_subpackage('highspy', exact=True) }}
       run:
         - ${{ pin_subpackage('highspy', exact=True) }}
