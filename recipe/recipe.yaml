@@ -58,7 +58,7 @@ outputs:
             - highspy/tests/
 
   - package:
-      name: highspy-hipo
+      name: highspy-extras
       version: ${{ version }}
     build:
       number: 0
@@ -70,32 +70,7 @@ outputs:
         - ${{ pin_subpackage('highspy', exact=True) }}
       run:
         - ${{ pin_subpackage('highspy', exact=True) }}
-        - openblas
-    tests:
-      - script:
-          - python -m pytest check/test_highspy_hipo.py
-        requirements:
-          run:
-            - python
-            - pytest
-        files:
-          source:
-            - check/
-
-  - package:
-      name: highspy-hipo-mkl
-      version: ${{ version }}
-    build:
-      number: 0
-      script: ${{ PYTHON }} -m pip install ./highspy-extras -vv --no-deps --no-build-isolation
-    requirements:
-      host:
-        - python
-        - pip
-        - ${{ pin_subpackage('highspy', exact=True) }}
-      run:
-        - ${{ pin_subpackage('highspy', exact=True) }}
-        - mkl
+        - libblas
     tests:
       - script:
           - python -m pytest check/test_highspy_hipo.py
