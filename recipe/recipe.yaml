@@ -85,6 +85,7 @@ outputs:
         - scikit-build-core
         - numpy
         - pybind11
+        - libblas
         - ${{ pin_subpackage('highspy', exact=True) }}
       run:
         - ${{ pin_subpackage('highspy', exact=True) }}
