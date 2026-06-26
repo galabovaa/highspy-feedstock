@@ -98,6 +98,7 @@ outputs:
           run:
             - python
             - pytest
+            - ${{ pin_subpackage('highspy', exact=True) }}
         files:
           source:
             - check/
